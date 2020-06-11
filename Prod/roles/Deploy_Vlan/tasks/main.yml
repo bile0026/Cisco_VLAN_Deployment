@@ -1,0 +1,9 @@
+---
+- import_tasks: get_parse_access.yml
+- import_tasks: get_parse_access.yml
+- import_tasks: get_parse_spanning-tree.yml
+- import_tasks: get_parse_trunks.yml
+- import_tasks: get_parse_vlans.yml
+- import_tasks: set_vlans.yml
+- import_tasks: set_access.yml
+- import_tasks: set_trunks.yml

@@ -1,0 +1,14 @@
+---
+# gather information from devices to use for parsing/configuration
+- name: Gather IOS Information
+  ios_facts:
+    gather_network_resources: l2_interfaces
+  register: ios_result 
+
+# parse information from devices in preparation for processing changes
+- name: Parse Access Interface Data
+  set_fact:
+    interfaces_parsed: "{{ ios_result.ansible_facts.ansible_network_resources | json_query(query) }}"
+  vars:
+    query: "l2_interfaces[].{name: name, vlan: access.vlan}"
+  delegate_to: localhost

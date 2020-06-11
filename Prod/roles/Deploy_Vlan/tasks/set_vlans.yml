@@ -1,0 +1,18 @@
+---
+# ensure that the target vlan esists on the switch. using ios_vlan until VTP version 2/3 bug is fixed in ios_vlans
+- name: Create VLAN target_vlan
+  when: "not (target_vlan | string) in vlan_further_parsed"  # this will not be required once it is determined what is causing the bug in ios_vlans 
+  ios_vlan:
+    vlan_id: "{{ target_vlan }}"
+    name: "{{ target_vlan_name }}"
+    state: present
+  # ios_vlans:
+  #  config:
+  #    - name: "{{ target_vlan_name }}"
+  #      vlan_id: "{{ target_vlan }}"
+  #      state: active
+  #      shutdown: disabled
+  #  state: merged
+  notify: save ios
+  register: vlan_create_errors
+  ignore_errors: true

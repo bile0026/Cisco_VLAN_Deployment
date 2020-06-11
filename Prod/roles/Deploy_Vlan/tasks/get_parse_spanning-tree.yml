@@ -1,0 +1,20 @@
+---
+# gather information from devices to use for parsing/configuration
+- name: Get Spanning-tree From Device
+  ios_command:
+    commands:
+      - "{{ spanning_tree_command }}"
+  register: spanning_output
+
+# parse information from devices in preparation for processing changes
+- name: Parse Spanning-tree Data
+  set_fact:
+    spanning_parsed: "{{ spanning_output['stdout'][0] | parse_genie(command=spanning_tree_command, os=ansible_network_os) }}"
+  delegate_to: localhost
+
+- name: Further Parse Spanning-tree Data
+  set_fact:
+    trunks_parsed: "{{ spanning_parsed | json_query(query1) }}"
+  vars:
+    query1: "*.vlans.*.interfaces"
+  delegate_to: localhost

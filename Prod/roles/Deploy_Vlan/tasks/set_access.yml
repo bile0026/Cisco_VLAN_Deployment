@@ -1,0 +1,14 @@
+---
+# update all access ports that are members of your "source_vlan" to memebers of your "target_vlan"
+- name: Update Access Interfaces
+  when: item.vlan == source_vlan
+  ios_l2_interfaces:
+    config:
+      - name: "{{ item.name }}"
+        access:
+          vlan: "{{ target_vlan }}"
+    state: merged
+  with_items:
+    - "{{ interfaces_parsed }}"
+  notify: save ios
+  register: access_change_result

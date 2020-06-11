@@ -1,0 +1,20 @@
+---
+ # update trunk links to allow the new "target_vlan". Currently set to use ios_config until bug in status: merged in ios_l2_interfaces is fixed.
+- name: Update Trunk Interfaces
+  vars:
+    query2: "ansible_network_resources.l2_interfaces[].{name: name, vlans: trunk.allowed_vlans}[?name == '{{ item.key }}'].vlans[?contains(@, '{{ target_vlan }}')]"
+    query3: "ansible_network_resources.l2_interfaces[].{name: name, vlans: trunk.allowed_vlans}[?name == '{{ item.key }}'].vlans | length(@)"
+  when: ( ((ios_result.ansible_facts | json_query(query3)) > 0) and (not (ios_result.ansible_facts | json_query(query2)) )) and  (item.value.type == "Shr" or item.value.type == "P2p")
+  ios_config:
+    lines:
+      - 'switchport trunk allowed vlan add {{ target_vlan }}'
+    parents: interface {{ item.key }}
+  #    ios_l2_interfaces:
+  #      config:
+  #    - name: "{{ item.key }}"
+  #      trunk:
+  #        allowed_vlans: "{{ target_vlan }}"
+  #  state: replaced
+  with_dict: "{{ trunks_parsed[0] }}"
+  notify: save ios
+  register: trunk_change_result
