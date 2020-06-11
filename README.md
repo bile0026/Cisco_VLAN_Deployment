@@ -47,6 +47,32 @@ Make sure this vlan is trunked on all existing interfaces you want the target_vl
 
 Also update the ```hosts:``` variable at the beginning of the file with the hosts you want to run this against, or groups that you want to run against in your Ansible inventory file.
 
+# Sample Playbook
+```
+---
+- name: Deploy new vlan
+  hosts: all
+  gather_facts: true
+  connection: network_cli
+
+  tasks:
+  # create a config backup prior to changes
+    - name: Save device configuration
+      ios_config:
+        backup: true
+
+    # bring in the genie parser plugin for processing show command results
+    - name: Read in parse_genie role
+      include_role:
+        name: clay584.parse_genie
+
+    # import deploy vlan role
+    - name: Include deploy_vlan role
+      import_role:
+        name: Deploy_Vlan
+
+```
+
 # Running the playbook
 Use ```ansible-playbook <filename>``` as the bare-bones command to run the file. You may need additional parameters based on your situation and your ansible.cfg file.
 
