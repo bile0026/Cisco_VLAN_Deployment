@@ -1,10 +1,17 @@
 ---
 - name: Deploy new vlan
   hosts: all
-  gather_facts: true
+  gather_facts: false
   connection: network_cli
 
   tasks:
+    - name: Gather Facts
+      cisco.ios.ios_facts:
+        gather_subset:
+          - interfaces
+
+    - debug: var=ansible_net_interfaces
+    
   # create a config backup prior to changes
     - name: Save device configuration
       ios_config:
