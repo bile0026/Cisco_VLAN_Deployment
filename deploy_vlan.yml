@@ -24,4 +24,4 @@
     # import deploy vlan role
     - name: Include deploy_vlan role
       import_role:
-        name: Deploy_Vlan
+        name: cisco_deploy_vlan
