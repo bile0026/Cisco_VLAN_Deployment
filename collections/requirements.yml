@@ -3,6 +3,6 @@
 # collections for deploy_vlan role
 
 collections:
-  name: cisco.ios.ios
-  source: https://galaxy.ansible.com
-  version: 1.2.1
+  - name: cisco.ios
+    source: https://galaxy.ansible.com
+    version: 1.2.1
