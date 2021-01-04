@@ -9,6 +9,6 @@
   tasks:
     - name: Gather Facts
       cisco.ios.ios_facts:
-        gather_network_resources: l2_interfaces
+        gather_network_resources: interfaces
 
     - debug: var=ansible_net_interfaces
