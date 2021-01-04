@@ -4,7 +4,7 @@
   gather_facts: false
   connection: network_cli
   vars:
-    network_os: ios
+    ansible_network_os: ios
 
   tasks:
     - name: Gather Facts
