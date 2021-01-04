@@ -3,7 +3,7 @@
 - name: Gather IOS Information
   ios_facts:
     gather_network_resources: l2_interfaces
-  register: ios_result 
+  register: ios_result
 
 # parse information from devices in preparation for processing changes
 - name: Parse Access Interface Data
