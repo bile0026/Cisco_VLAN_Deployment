@@ -10,5 +10,6 @@
     - name: Gather Facts
       cisco.ios.ios_facts:
         gather_subset: all
+      register: ios_facts
 
-    - debug: var=ansible_net_interfaces
+    - debug: var=ios_facts
