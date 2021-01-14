@@ -1,0 +1,39 @@
+---
+- name: Deploy new vlan
+  hosts: all
+  gather_facts: false
+  connection: network_cli
+  vars:
+    ansible_network_os: ios
+
+  tasks:
+    - name: Gather Facts
+      cisco.ios.ios_facts:
+        gather_network_resources: l2_interfaces
+
+    # - debug: var=ansible_network_resources.l2_interfaces
+    
+    - name: Set Access Ports
+      cisco.ios.ios_l2_interfaces:
+        config:
+          - name: "{{ item.name }}"
+            access:
+              vlan: 200
+        state: merged
+      with_items: "{{ ansible_network_resources.l2_interfaces }}"
+      when:
+        - item.mode is defined
+        - item.mode == 'access'
+        - item.access.vlan == 100
+
+    - name: Set Trunk Ports
+      cisco.ios.ios_config:
+        lines:
+          - 'switchport trunk allowed vlan add 200'
+        parents: interface {{ item.name }}
+      with_items: "{{ ansible_network_resources.l2_interfaces }}"
+      when:
+        - item.mode is defined
+        - item.mode == 'trunk'
+        - item.trunk.native_vlan is defined
+        - item.trunk.native_vlan == 4000

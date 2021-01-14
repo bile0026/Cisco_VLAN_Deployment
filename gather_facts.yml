@@ -13,7 +13,9 @@
     
     - name: Debug variable
       debug:
-        var: item
-      with_items:
-        - "{{ ansible_network_resources.l2_interfaces }}"
-      when: ansible_network_resources.l2_interfaces.mode == 'access'
+        var: item.mode
+      with_items: "{{ ansible_network_resources.l2_interfaces }}"
+      when:
+        - item.mode is defined
+        - item.name != 'FastEthernet0'
+        - item.mode == 'access'
