@@ -5,6 +5,8 @@
   connection: network_cli
   vars:
     ansible_network_os: ios
+    target_vlan: 201
+    target_vlan_name: "Test VLAN2"
 
   tasks:
     - name: Gather Facts
@@ -13,15 +15,20 @@
           - l2_interfaces
           - vlans
     
-    - name: Create VLAN target_vlan
+    - name: Check for VLAN {{ target_vlan }}
       debug:
-        msg: "{{ item }}"
-      # cisco.ios.ios_vlans:
-      #   config:
-      #   - name: "{{ target_vlan_name }}"
-      #     vlan_id: "{{ target_vlan }}"
-      #     state: active
-      #     shutdown: disabled
-      #   state: merged
+        msg: Checking VLAN "{{ item }}"
       with_items: "{{ ansible_network_resources.vlans }}"
-      #when: target_vlan not in item
+      changed_when: target_vlan == item.vlan_id
+      register: vlan_check
+      no_log: true
+
+    - name: Create VLAN target_vlan
+      cisco.ios.ios_vlans:
+        config:
+        - name: "{{ target_vlan_name }}"
+          vlan_id: "{{ target_vlan }}"
+          state: active
+          shutdown: disabled
+        state: merged
+      when: not vlan_check.changed
