@@ -1,32 +1,28 @@
 # Cisco_VLAN_Deployment
 VLAN Deployment with Source and Target Vlan
 
-This is a project for deploying vlans to Cisco devices with Ansible. This playbook will need to be updated with source and target vlan numbers for your case. It will take into account things like trunking the new vlan, changing access ports from a current vlan to a new vlan, and making sure the Layer2 vlan object exists. You can enable or disable these functions by commenting out the specific playbooks in the ```roles/Deploy_Vlan/tasks/main.yml``` file.
+This is a project for deploying and changing access vlans to Cisco devices with Ansible. This playbook will need to be updated with source and target vlan numbers for your case. It will take into account things like trunking the new vlan, changing access ports from a current vlan to a new vlan, and making sure the Layer2 vlan object exists. 
 
-The current production version is ```Prod/deploy_vlan.yml```. There are a few things that will need to be updated for your intended results. These are outlined below. Deploy_Vlans has been converted to a role, so there's some additional considerations to take into place.
+# Notes
+* Updated to no longer require the genie parser. All that's needed is the cisco.ios collection!
 
 # Requirements
 A couple of requirements for this role need to be installed along with ansible.
 
-- [ ] Install Python3 if it is not already installed ```sudo apt/yum install python3``` (Most distributions include this by default now).
-- [ ] The pyats/genie applications this playbook uses are required to be run in a python virtual environment.
-    - [ ] Create a working directory with ```mkdir <directory_name>```
-    - [ ] Cd into the new directory ```cd <directory_name>```
-    - [ ] Run ```Python3 -m venv .venv``` (This creates the virtual environment in your current directory)
-    - [ ] Run ```source .venv/bin/activate``` to place your session into the Python virtual environment. (You can use this same command in the future to place you back into the virtual environment for future work)
-- [ ] pip3 needs to be installed inside the virtual environment. ```sudo apt/yum install python3-pip```
-- [ ] Use the requirements file included in this repository to install the necessary prerequisites. ```sudo pip3 -r requirements.txt```
+- [ ] Install cisco.ios collection `ansible-galaxy collection install cisco.ios`
 
 Once your prerequisites are taken care of, you can move on to prepping the playbook.
 
-# Files to Change
+# Variables to Change
 
 ```
 # roles/Deploy_Vlan/defaults/main.yml
 target_vlan: <new_vlan_number>
+target_vlan_string: <new vlan number in string>
 target_vlan_name: <vlan_name>
 source_vlan: <current_vlan_number>
-trunking_vlan: <vlan_to_identify_trunks>
+trunk_native_vlan: <vlan_to_identify_trunks>
+alt_trunk_native_vlan: <second native vlan to identify trunks>
 
 # deploy_vlan.yml
 hosts: <hosts,groupnames>
@@ -38,11 +34,13 @@ hosts: <hosts,groupnames>
 * gather_facts: This will need to be set to yes, as the tasks rely on some of this information.
 * connection: How to connect to the device.
 * target_vlan: This is the variable for the new vlan that you would like to change source_vlan to.
+* target_vlan_string: Target vlan in string format for identifying if it's already on a trunk link.
 * target_vlan_name: Name for the new L2 vlan object.
 * source_vlan: The existing vlan you are looking to update.
-* trunking_vlan: This is the vlan that will be used to determine which trunk links to add the new vlan to.
-Make sure this vlan is trunked on all existing interfaces you want the target_vlan added to.
-* spanning_tree_command: Used by the parser to know which vlan to check spanning-tree information on.
+* trunk_native_vlan: This is the vlan that will be used to determine which trunk links to add the new vlan to.
+Make sure this vlan is the native vlan on all existing interfaces you want the target_vlan added to.
+* alt_trunk_native_vlan: secondary option for native vlans.
+  - could have additional if added as additional variables and added or statements to when: on set trunk interfaces task.
 * ansible_network_os: What operating system the device has (ios, junos, nxos, etc...)
 
 Also update the ```hosts:``` variable at the beginning of the file with the hosts you want to run this against, or groups that you want to run against in your Ansible inventory file.
@@ -61,15 +59,10 @@ Also update the ```hosts:``` variable at the beginning of the file with the host
       ios_config:
         backup: true
 
-    # bring in the genie parser plugin for processing show command results
-    - name: Read in parse_genie role
-      include_role:
-        name: clay584.parse_genie
-
     # import deploy vlan role
-    - name: Include deploy_vlan role
+    - name: Include cisco_deploy_vlan role
       import_role:
-        name: Deploy_Vlan
+        name: roles/cisco_deploy_vlan
 
 ```
 
