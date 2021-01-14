@@ -7,7 +7,9 @@
   tasks:
     - name: Gather Facts
       cisco.ios.ios_facts:
-        gather_network_resources: l2_interfaces
+        gather_network_resources:
+          - l2_interfaces
+          - vlans
 
   # create a config backup prior to changes
     - name: Save device configuration

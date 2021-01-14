@@ -1,6 +1,6 @@
 ---
 # backup and save configuration handler
-  # - name: save ios
-  #   ios_command:
-  #     commands: "write memory"
-  #   when: not ansible_check_mode
+- name: save ios
+  ios_command:
+    commands: "write memory"
+  when: not ansible_check_mode

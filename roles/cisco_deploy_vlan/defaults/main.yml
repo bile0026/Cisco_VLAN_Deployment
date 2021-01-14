@@ -1,6 +1,1 @@
-ansible_network_os: ios
-target_vlan: 200
-target_vlan_name: Test-VLAN
-source_vlan: 100
-trunking_vlan: 4000
-spanning_tree_command: show spanning-tree vlan "{{ trunking_vlan }}"
+

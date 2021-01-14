@@ -1,7 +1,9 @@
-vars:
- ansible_network_os: ios
- target_vlan: 200
- target_vlan_name: Test-VLAN
- source_vlan: 100
- trunking_vlan: 4000
- spanning_tree_command: show spanning-tree vlan "{{ trunking_vlan }}"
+---
+
+ansible_network_os: ios
+source_vlan: 100
+target_vlan: 200
+target_vlan_string: '200'
+target_vlan_name: "Test VLAN"
+trunk_native_vlan: 4000
+alt_trunk_native_vlan: 99
