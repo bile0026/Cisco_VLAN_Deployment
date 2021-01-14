@@ -1,0 +1,21 @@
+---
+- name: Deploy new vlan
+  hosts: all
+  gather_facts: false
+  connection: network_cli
+  vars:
+    ansible_network_os: ios
+
+  tasks:
+    - name: Gather Facts
+      cisco.ios.ios_facts:
+        gather_network_resources: l2_interfaces
+    
+    - name: Debug variable
+      debug:
+        var: item.mode
+      with_items: "{{ ansible_network_resources.l2_interfaces }}"
+      when:
+        - item.mode is defined
+        - item.name != 'FastEthernet0'
+        - item.mode == 'access'
