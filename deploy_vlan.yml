@@ -9,19 +9,12 @@
       cisco.ios.ios_facts:
         gather_network_resources: l2_interfaces
 
-    - debug: var=ansible_net_interfaces
-
   # create a config backup prior to changes
     - name: Save device configuration
       ios_config:
         backup: true
 
-    # bring in the genie parser plugin for processing show command results
-    - name: Read in parse_genie role
-      include_role:
-        name: clay584.parse_genie
-
     # import deploy vlan role
-    - name: Include deploy_vlan role
+    - name: Include cisco_deploy_vlan role
       import_role:
         name: cisco_deploy_vlan
