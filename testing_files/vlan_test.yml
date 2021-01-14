@@ -1,0 +1,27 @@
+---
+- name: Deploy new vlan
+  hosts: all
+  gather_facts: false
+  connection: network_cli
+  vars:
+    ansible_network_os: ios
+
+  tasks:
+    - name: Gather Facts
+      cisco.ios.ios_facts:
+        gather_network_resources:
+          - l2_interfaces
+          - vlans
+    
+    - name: Create VLAN target_vlan
+      debug:
+        msg: "{{ item }}"
+      # cisco.ios.ios_vlans:
+      #   config:
+      #   - name: "{{ target_vlan_name }}"
+      #     vlan_id: "{{ target_vlan }}"
+      #     state: active
+      #     shutdown: disabled
+      #   state: merged
+      with_items: "{{ ansible_network_resources.vlans }}"
+      #when: target_vlan not in item

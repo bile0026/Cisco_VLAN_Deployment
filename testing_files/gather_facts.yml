@@ -9,13 +9,19 @@
   tasks:
     - name: Gather Facts
       cisco.ios.ios_facts:
-        gather_network_resources: l2_interfaces
+        gather_network_resources:
+          - l2_interfaces
+          - vlans
+
+    - debug: var=ansible_network_resources.vlans
     
-    - name: Debug variable
-      debug:
-        var: item.mode
-      with_items: "{{ ansible_network_resources.l2_interfaces }}"
-      when:
-        - item.mode is defined
-        - item.name != 'FastEthernet0'
-        - item.mode == 'access'
+    # - name: Debug variable
+    #   debug:
+    #     var: item
+    #   with_items:
+    #     #- "{{ ansible_network_resources.l2_interfaces }}"
+    #     - "{{ ansible_network_resources.vlans }}"
+      # when:
+      #   - item.mode is defined
+      #   - item.name != 'FastEthernet0'
+      #   - item.mode == 'access'
