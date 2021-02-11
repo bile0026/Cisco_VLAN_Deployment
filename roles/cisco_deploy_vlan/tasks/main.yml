@@ -1,5 +1,4 @@
 ---
-
 - name: Check for VLAN {{ target_vlan }}
   debug:
     msg: Checking VLAN "{{ item }}"
@@ -11,12 +10,26 @@
 - name: Create VLAN target_vlan
   cisco.ios.ios_vlans:
     config:
-    - name: "{{ target_vlan_name }}"
-      vlan_id: "{{ target_vlan }}"
-      state: active
-      shutdown: disabled
+      - name: "{{ target_vlan_name }}"
+        vlan_id: "{{ target_vlan }}"
+        state: active
+        shutdown: disabled
     state: merged
   when: not vlan_check.changed
+  notify: save ios
+
+- name: Set Trunk Ports
+  cisco.ios.ios_config:
+    lines:
+      - "switchport trunk allowed vlan add {{ target_vlan }}"
+    parents: interface {{ item.name }}
+  with_items: "{{ ansible_network_resources.l2_interfaces }}"
+  when:
+    - item.mode is defined
+    - item.mode == 'trunk'
+    - item.trunk.native_vlan is defined
+    - item.trunk.native_vlan == trunk_native_vlan or item.trunk.native_vlan == alt_trunk_native_vlan
+    - target_vlan_string not in item.trunk.allowed_vlans
   notify: save ios
 
 - name: Set Access Ports
@@ -31,18 +44,4 @@
     - item.mode is defined
     - item.mode == 'access'
     - item.access.vlan == source_vlan
-  notify: save ios
-
-- name: Set Trunk Ports
-  cisco.ios.ios_config:
-    lines:
-      - 'switchport trunk allowed vlan add {{ target_vlan }}'
-    parents: interface {{ item.name }}
-  with_items: "{{ ansible_network_resources.l2_interfaces }}"
-  when:
-    - item.mode is defined
-    - item.mode == 'trunk'
-    - item.trunk.native_vlan is defined
-    - item.trunk.native_vlan == trunk_native_vlan or item.trunk.native_vlan == alt_trunk_native_vlan
-    - target_vlan_string not in item.trunk.allowed_vlans
   notify: save ios
