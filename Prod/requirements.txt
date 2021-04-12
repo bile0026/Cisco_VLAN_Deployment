@@ -23,7 +23,7 @@ genie.predcore==19.12
 idna==2.9
 idna-ssl==1.1.0
 importlib-metadata==1.6.0
-Jinja2==2.11.2
+Jinja2==2.11.3
 jmespath==0.9.5
 jsonpickle==1.4.1
 junit-xml==1.9
