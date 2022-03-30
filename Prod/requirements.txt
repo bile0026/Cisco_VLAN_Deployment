@@ -30,7 +30,7 @@ junit-xml==1.9
 MarkupSafe==1.1.1
 multidict==4.7.5
 netaddr==0.7.19
-paramiko==2.7.1
+paramiko==2.10.1
 pathspec==0.8.0
 prettytable==0.7.2
 psutil==5.7.0
